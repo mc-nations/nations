@@ -1,0 +1,7 @@
+name: nations
+version: '${version}'
+main: com.itsziroy.nations.Nations
+api-version: '1.20'
+
+softdepend:
+  - ServerTimeLock

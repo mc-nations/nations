@@ -1,0 +1,5 @@
+event_start:
+  date: "2023-11-04"
+  time: "10:00"
+
+motd_countdown: true
