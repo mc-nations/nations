@@ -71,6 +71,6 @@ public class ServerListener implements Listener {
         return ""+ ChatColor.AQUA +
                 duration.toDaysPart() + ChatColor.GRAY + (duration.toDaysPart() == 1 ? " Tag, " : " Tagen, ")
                 + ChatColor.AQUA + duration.toHoursPart()  + ChatColor.GRAY + (duration.toHoursPart() == 1 ? " Stunde und " : " Stunden und ")
-                + ChatColor.AQUA +  duration.toMinutesPart() + ChatColor.GRAY + (duration.toMinutesPart() == 1 ? " Minute " : " Minuten ");
+                + ChatColor.AQUA +  duration.toMinutesPart() + ChatColor.GRAY + (duration.toMinutesPart() == 1 ? " Minute " : " Minuten");
     }
 }
