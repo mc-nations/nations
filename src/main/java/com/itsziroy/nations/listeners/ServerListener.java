@@ -55,12 +55,12 @@ public class ServerListener implements Listener {
                     if(serverTimeLock.isLocked()) {
                         Duration duration = Duration.ofSeconds(serverTimeLock.getRemainingCloseTime());
 
-                        event.setMotd(ChatColor.GRAY + "Server oeffnet wieder in " + durationToFormattedString(duration)+ ".");
+                        event.setMotd(ChatColor.GRAY + "Server \u00F6ffnet wieder in " + durationToFormattedString(duration)+ ".");
                     } else {
                         Duration duration = Duration.ofSeconds(serverTimeLock.getRemainingTime());
 
 
-                        event.setMotd(ChatColor.GRAY + "Willkommen bei Minecraft Nations! Der Server schliesst wieder in " + durationToFormattedString(duration) + ".");
+                        event.setMotd(ChatColor.GRAY + "Willkommen bei Minecraft Nations! Der Server schlie\u00DFt wieder in " + durationToFormattedString(duration) + ".");
                     }
                 }
             }
