@@ -4,9 +4,13 @@ import com.itsziroy.nations.listeners.PlayerListener;
 import com.itsziroy.nations.listeners.ServerListener;
 import com.itsziroy.servertimelock.ServerTimeLockPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.*;
 
 public final class Nations extends JavaPlugin {
 
@@ -18,14 +22,16 @@ public final class Nations extends JavaPlugin {
         // Plugin startup logic
         serverTimeLockPlugin = (ServerTimeLockPlugin) Bukkit.getPluginManager().getPlugin("ServerTimeLock");
 
-        if(serverTimeLockPlugin == null) {
+        if(serverTimeLockPlugin != null) {
             this.setEnabled(false);
         }
-
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
+
+
         registerConfig();
+        setGameRules();
 
     }
 
@@ -44,5 +50,36 @@ public final class Nations extends JavaPlugin {
 
     public ServerTimeLockPlugin getServerTimeLockPlugin() {
         return serverTimeLockPlugin;
+    }
+
+    public void setGameRules() {
+        if(this.getConfig().getBoolean(Config.Path.GAME_RULES_ENABLED)) {
+            ConfigurationSection gameRulesConfig = this.getConfig().getConfigurationSection(Config.Path.GAME_RULES);
+            if (gameRulesConfig != null) {
+                Set<String> worlds = gameRulesConfig.getKeys(false);
+                for (String worldName : worlds) {
+                    World world = Bukkit.getWorld(worldName);
+                    ConfigurationSection gameRules = this.getConfig().getConfigurationSection(Config.Path.GAME_RULES + "." + worldName);
+                    if (gameRules != null) {
+                        Set<String> gameRuleKeys = gameRules.getKeys(false);
+                        for (String gameRuleKey : gameRuleKeys) {
+                            String gameRuleValue = gameRules.getString(gameRuleKey);
+                            GameRule<?> gameRule = GameRule.getByName(gameRuleKey);
+                            if (gameRule != null) {
+                                if (gameRuleValue != null) {
+                                    getLogger().info("Setting Game Rule " +
+                                            gameRule.getName()  + " for "
+                                            + worldName  + " to "
+                                            + gameRuleValue );
+                                    world.setGameRuleValue(gameRuleKey, gameRuleValue);
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
     }
 }

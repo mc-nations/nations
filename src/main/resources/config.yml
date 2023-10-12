@@ -3,3 +3,29 @@ event_start:
   time: "10:00"
 
 motd_countdown: true
+
+game_rules:
+  enabled: true
+  world:
+    doInsomnia: false
+    doFireTick: false
+    doImmediateRespawn: true
+    doTraderSpawning: false
+    doWardenSpawning: false
+    reducedDebugInfo: true
+    showCoordinates: false
+
+team_borders:
+  enabled: true
+  wueste:
+    x: 1792
+    z: -1792
+    size: 2560
+  schnee:
+    x: -1792
+    z: -1792
+    size: 2560
+  dschungel:
+    x: 0
+    z: 1792
+    size: 2560

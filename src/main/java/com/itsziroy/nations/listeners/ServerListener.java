@@ -1,5 +1,6 @@
 package com.itsziroy.nations.listeners;
 
+import com.itsziroy.nations.Config;
 import com.itsziroy.nations.Nations;
 import com.itsziroy.servertimelock.ServerTimeLockPlugin;
 import org.bukkit.ChatColor;
@@ -23,11 +24,11 @@ public class ServerListener implements Listener {
     @EventHandler
     public void onServerListPing(ServerListPingEvent event) {
 
-        Boolean enabled = this.plugin.getConfig().getBoolean("motd_countdown");
+        Boolean enabled = this.plugin.getConfig().getBoolean(Config.Path.MOTD_COUNTDOWN);
 
         if(enabled) {
-            String date = this.plugin.getConfig().getString("event_start.date");
-            String time = this.plugin.getConfig().getString("event_start.time");
+            String date = this.plugin.getConfig().getString(Config.Path.EVENT_START_DATE);
+            String time = this.plugin.getConfig().getString(Config.Path.EVENT_START_TIME);
             if (date != null && time != null) {
                 Calendar calendar = Calendar.getInstance();
                 Calendar currentCalendar = Calendar.getInstance();
@@ -54,6 +55,7 @@ public class ServerListener implements Listener {
                     ServerTimeLockPlugin serverTimeLock = plugin.getServerTimeLockPlugin();
                     if(serverTimeLock.isLocked()) {
                         Duration duration = Duration.ofSeconds(serverTimeLock.getRemainingCloseTime());
+
 
                         event.setMotd(ChatColor.GRAY + "Server \u00F6ffnet wieder in " + durationToFormattedString(duration)+ ".");
                     } else {
