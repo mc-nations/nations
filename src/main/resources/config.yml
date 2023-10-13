@@ -17,15 +17,16 @@ game_rules:
 
 team_borders:
   enabled: true
-  wueste:
-    x: 1792
-    z: -1792
-    size: 2560
-  schnee:
-    x: -1792
-    z: -1792
-    size: 2560
-  dschungel:
-    x: 0
-    z: 1792
-    size: 2560
+  teams:
+    wueste:
+      x: 1792
+      z: -1792
+      size: 2560
+    schnee:
+      x: -1792
+      z: -1792
+      size: 2560
+    dschungel:
+      x: 0
+      z: 1792
+      size: 2560

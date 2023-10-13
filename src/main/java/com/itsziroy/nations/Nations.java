@@ -1,8 +1,11 @@
 package com.itsziroy.nations;
 
+import co.aikar.commands.PaperCommandManager;
+import com.itsziroy.nations.commands.Commands;
+import com.itsziroy.nations.commands.TabCompletions;
 import com.itsziroy.nations.listeners.PlayerListener;
 import com.itsziroy.nations.listeners.ServerListener;
-import com.itsziroy.servertimelock.ServerTimeLockPlugin;
+import com.itsziroy.servertimelock.ServerTimeLock;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
@@ -15,16 +18,25 @@ import java.util.*;
 public final class Nations extends JavaPlugin {
 
 
-    private ServerTimeLockPlugin serverTimeLockPlugin;
+    private ServerTimeLock serverTimeLockPlugin;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        serverTimeLockPlugin = (ServerTimeLockPlugin) Bukkit.getPluginManager().getPlugin("ServerTimeLock");
-
-        if(serverTimeLockPlugin != null) {
+        serverTimeLockPlugin = (ServerTimeLock) Bukkit.getPluginManager().getPlugin("ServerTimeLock");
+        if(serverTimeLockPlugin == null) {
             this.setEnabled(false);
+            return;
         }
+
+
+        // Regster Command and Tab Completion
+        PaperCommandManager manager = new PaperCommandManager(this);
+
+        Commands.register(manager, this);
+        TabCompletions.register(manager, this);
+
+
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
@@ -48,7 +60,7 @@ public final class Nations extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public ServerTimeLockPlugin getServerTimeLockPlugin() {
+    public ServerTimeLock getServerTimeLockPlugin() {
         return serverTimeLockPlugin;
     }
 

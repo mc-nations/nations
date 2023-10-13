@@ -2,7 +2,7 @@ package com.itsziroy.nations.listeners;
 
 import com.itsziroy.nations.Config;
 import com.itsziroy.nations.Nations;
-import com.itsziroy.servertimelock.ServerTimeLockPlugin;
+import com.itsziroy.servertimelock.ServerTimeLock;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,7 +24,7 @@ public class ServerListener implements Listener {
     @EventHandler
     public void onServerListPing(ServerListPingEvent event) {
 
-        Boolean enabled = this.plugin.getConfig().getBoolean(Config.Path.MOTD_COUNTDOWN);
+        boolean enabled = this.plugin.getConfig().getBoolean(Config.Path.MOTD_COUNTDOWN);
 
         if(enabled) {
             String date = this.plugin.getConfig().getString(Config.Path.EVENT_START_DATE);
@@ -52,7 +52,7 @@ public class ServerListener implements Listener {
 
                     event.setMotd(ChatColor.DARK_PURPLE + "Minecraft Nations " + ChatColor.GRAY + "startet in " + durationToFormattedString(duration) + ".");
                 } else {
-                    ServerTimeLockPlugin serverTimeLock = plugin.getServerTimeLockPlugin();
+                    ServerTimeLock serverTimeLock = plugin.getServerTimeLockPlugin();
                     if(serverTimeLock.isLocked()) {
                         Duration duration = Duration.ofSeconds(serverTimeLock.getRemainingCloseTime());
 

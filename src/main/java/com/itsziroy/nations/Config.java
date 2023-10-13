@@ -10,6 +10,8 @@ public interface Config {
         String EVENT_START_DATE = "event_start.date";
         String EVENT_START_TIME = "event_start.time";
         String TEAM_BORDERS = "team_borders";
+        String TEAM_BORDERS_TEAMS = "team_borders.teams";
+
         String TEAM_BORDERS_ENABLED = "team_borders.enabled";
 
 

@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
 }
 
@@ -15,6 +16,7 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven { url = "https://repo.aikar.co/content/groups/aikar/" }
     flatDir {
         dirs '../server-time-lock/build/libs'
     }
@@ -23,6 +25,11 @@ repositories {
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT"
     compileOnly "com.itsziroy:server-time-lock:1.0-SNAPSHOT"
+    implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
+}
+shadowJar {
+    relocate 'co.aikar.commands', 'com.itsziroy.nations.acf'
+    relocate 'co.aikar.locales', 'com.itsziroy.nations.locales'
 }
 
 def targetJavaVersion = 17
