@@ -7,4 +7,5 @@ public class Util {
     public static boolean isOnlinePlayer(String name) {
         return Bukkit.getPlayer(name) != null;
     }
+
 }

@@ -5,7 +5,9 @@ import com.itsziroy.nations.commands.Commands;
 import com.itsziroy.nations.commands.TabCompletions;
 import com.itsziroy.nations.listeners.PlayerListener;
 import com.itsziroy.nations.listeners.ServerListener;
+import com.itsziroy.nations.manager.PlayerTeamManager;
 import com.itsziroy.servertimelock.ServerTimeLock;
+import github.scarsz.discordsrv.DiscordSRV;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
@@ -20,11 +22,16 @@ public final class Nations extends JavaPlugin {
 
     private ServerTimeLock serverTimeLockPlugin;
 
+    private DiscordSRV discordSRV;
+
+    private final PlayerTeamManager playerTeamManager = new PlayerTeamManager(this);
+
     @Override
     public void onEnable() {
         // Plugin startup logic
         serverTimeLockPlugin = (ServerTimeLock) Bukkit.getPluginManager().getPlugin("ServerTimeLock");
-        if(serverTimeLockPlugin == null) {
+        discordSRV = (DiscordSRV) Bukkit.getPluginManager().getPlugin("DiscordSRV");
+        if(serverTimeLockPlugin == null || discordSRV == null) {
             this.setEnabled(false);
             return;
         }
@@ -40,12 +47,24 @@ public final class Nations extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
+        playerTeamManager.load();
+
 
 
         registerConfig();
         setGameRules();
 
     }
+
+    public DiscordSRV getDiscordSRV() {
+        return discordSRV;
+    }
+
+
+    public PlayerTeamManager getPlayerTeamManager() {
+        return playerTeamManager;
+    }
+
 
     public void registerConfig(){
         File config = new File(this.getDataFolder(), "config.yml");
