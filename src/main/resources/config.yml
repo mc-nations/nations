@@ -15,6 +15,18 @@ game_rules:
     reducedDebugInfo: true
     showCoordinates: false
 
+
+
+spawn_exclusion:
+  max_height:
+    schnee: 100
+    wueste: 100
+    dschungel: 100
+  regions:
+      - x: 8
+        z: 2010
+        size: 200
+
 team_borders:
   enabled: true
   teams:

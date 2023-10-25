@@ -14,6 +14,10 @@ public interface Config {
 
         String TEAM_BORDERS_ENABLED = "team_borders.enabled";
 
+        String SPAWN_EXLCUSION = "spawn_exclusion";
+        String SPAWN_EXLCUSION_MAX_HEIGHT = "spawn_exclusion.max_height";
+        String SPAWN_EXLCUSION_REGIONS = "spawn_exclusion.regions";
+
 
     }
 
