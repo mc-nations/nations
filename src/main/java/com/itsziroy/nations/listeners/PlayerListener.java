@@ -3,18 +3,20 @@ package com.itsziroy.nations.listeners;
 import com.itsziroy.nations.Config;
 import com.itsziroy.nations.Nations;
 import com.itsziroy.nations.Permission;
-import github.scarsz.discordsrv.DiscordSRV;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.scoreboard.Team;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,45 +30,11 @@ public class PlayerListener implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler()
     public void onPlayerJoinSetWorldBorder(PlayerJoinEvent event) {
         if (plugin.getConfig().getBoolean(Config.Path.TEAM_BORDERS_ENABLED)) {
             if (!event.getPlayer().hasPermission(Permission.BYPASS_TEAM_BORDERS)) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    Player player = event.getPlayer();
-                    Team playerTeam = getTeamForPlayer(player);
-
-
-                    if (playerTeam != null) {
-                        ConfigurationSection teamBorders = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS);
-                        if (teamBorders != null) {
-                            Set<String> teamNames = teamBorders.getKeys(false);
-                            for (String teamName : teamNames) {
-                                if (playerTeam.getName().equals(teamName)) {
-
-                                    ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS + "." + teamName);
-                                    if (teamBorder != null) {
-                                        WorldBorder worldBorder = Bukkit.createWorldBorder();
-                                        double x = teamBorder.getDouble("x");
-                                        double z = teamBorder.getDouble("z");
-                                        double size = teamBorder.getDouble("size");
-
-                                        plugin.getLogger().info("Setting world border for " + player.getName() + " to "
-                                                + x + ", "
-                                                + z + ", "
-                                                + size + ".");
-
-                                        worldBorder.setCenter(x, z);
-                                        worldBorder.setSize(size);
-
-                                        player.setWorldBorder(worldBorder);
-                                    }
-
-                                }
-                            }
-                        }
-                    }
-                }, 10);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> setWorldBorder(event.getPlayer()), 10);
             } else {
                 plugin.getLogger().info("Player " + event.getPlayer().getName() + " has permission to bypass team borders.");
             }
@@ -74,36 +42,78 @@ public class PlayerListener implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onFirstJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        String discordId = this.plugin.getDiscordSRV().getAccountLinkManager().getDiscordId(player.getUniqueId());
+        if(this.plugin.getConfig().getBoolean(Config.Path.ENABLE_RANDOM_SPAWN)) {
+            Player player = event.getPlayer();
+            if(!player.hasPermission(Permission.BYPASS_RANDOM_SPAWN)) {
+                String discordId = this.plugin.getDiscordSRV().getAccountLinkManager().getDiscordId(player.getUniqueId());
 
-        String team = this.plugin.getPlayerTeamManager().getTeamForPlayer(discordId);
-        Bukkit.getLogger().info("Player " + player.getName() + " joined with discord id " + discordId + " and team " + team);
-        if (team != null) {
-            if (getTeamForPlayer(event.getPlayer()) != null) {
-                Location spawnLocation = findSafeSpawnLocation(player, team);
-                // Spieler teleportieren
-                player.teleport(spawnLocation);
+                String team = this.plugin.getPlayerTeamManager().getTeamForPlayer(discordId);
+                Bukkit.getLogger().info("Player " + player.getName() + " joined with discord id " + discordId + " and team " + team);
+                if (team != null) {
+                    if (getScoreboardTeamForPlayer(player) == null) {
 
-                // 5 gegartes Rindfleisch ins Inventar
-                ItemStack cookedBeef = new ItemStack(Material.COOKED_BEEF, 5);
-                player.getInventory().addItem(cookedBeef);
+                        Bukkit.getScheduler().runTaskLater(this.plugin, () -> addPlayerToScoreboardTeam(player, team), 10);
 
-                // Buch erstellen
-                ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-                BookMeta bookMeta = (BookMeta) book.getItemMeta();
-                bookMeta.setTitle("Mein Buch");
-                bookMeta.setAuthor("Dein Server");
-                bookMeta.addPage(ChatColor.BLACK + "Hier Text einfügen");
-                book.setItemMeta(bookMeta);
+                        if (!event.getPlayer().hasPermission(Permission.BYPASS_TEAM_BORDERS)) {
+                            Bukkit.getScheduler().runTaskLater(plugin, () -> setWorldBorder(player), 20);
+                        } else {
+                            plugin.getLogger().info("Player " + event.getPlayer().getName() + " has permission to bypass team borders.");
+                        }
 
-                player.getInventory().addItem(book);
+                        Location spawnLocation = findSafeSpawnLocation(player, team);
+                        // Spieler teleportieren
+                        player.teleport(spawnLocation);
 
+                        // 5 gegartes Rindfleisch ins Inventar
+                        ItemStack cookedBeef = new ItemStack(Material.COOKED_BEEF, 5);
+                        player.getInventory().addItem(cookedBeef);
+
+                        // Buch erstellen
+                        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+                        BookMeta bookMeta = (BookMeta) book.getItemMeta();
+                        bookMeta.setTitle("Mein Buch");
+                        bookMeta.setAuthor("Dein Server");
+                        bookMeta.addPage(ChatColor.BLACK + "Hier Text einfügen");
+                        book.setItemMeta(bookMeta);
+
+                        player.getInventory().addItem(book);
+
+                    }
+                }
+            } else {
+                plugin.getLogger().info("Player " + player.getName() + " bypasses random spawns.");
             }
-        } else {
-            event.getPlayer().kickPlayer("KICK");
+        }
+    }
+    @EventHandler
+    public void onJoin(PlayerLoginEvent event) {
+        // Check if event started or not
+        if(!event.getPlayer().hasPermission(Permission.BYPASS_EVENT_START)) {
+            if (this.plugin.getConfig().getBoolean(Config.Path.EVENT_START_DISABLE_JOIN)) {
+                if (this.plugin.getEventStartDate() != null) {
+                    long diff = this.plugin.getEventStartDate().getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+                    if (diff > 0) {
+                        event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Das Event ist noch nicht gestartet!");
+                    }
+                }
+            }
+        }
+
+        // Check if we are enforcing teams
+        if(this.plugin.getConfig().getBoolean(Config.Path.ENFORCE_TEAMS)) {
+            Player player = event.getPlayer();
+            if(!player.hasPermission(Permission.BYPASS_ENFORCE_TEAMS)) {
+                String discordId = this.plugin.getDiscordSRV().getAccountLinkManager().getDiscordId(player.getUniqueId());
+
+                String team = this.plugin.getPlayerTeamManager().getTeamForPlayer(discordId);
+                if (team == null) {
+                    event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Dir wurde noch kein Biom zugewiesen. Bitte wende dich an einen Server Administrator wenn dieser Fehler weiterhin auftritt.");
+                }
+            } else {
+                plugin.getLogger().info("Player " + player.getName() + " has Permission to join without Team");
+            }
         }
     }
 
@@ -173,9 +183,17 @@ public class PlayerListener implements Listener {
 
 
 
+    public void addPlayerToScoreboardTeam(Player player, String name) {
+        Set<Team> teams = player.getScoreboard().getTeams();
+        for (Team team : teams) {
+            if (team.getName().equals(name)) {
+                team.addEntry(player.getName());
+            }
+        }
+    }
 
 
-    public Team getTeamForPlayer(Player player) {
+    public Team getScoreboardTeamForPlayer(Player player) {
         Set<Team> teams = player.getScoreboard().getTeams();
 
         for (Team team : teams) {
@@ -184,5 +202,40 @@ public class PlayerListener implements Listener {
             }
         }
         return null;
+    }
+
+    public void setWorldBorder(Player player) {
+        Team playerTeam = getScoreboardTeamForPlayer(player);
+
+
+        if (playerTeam != null) {
+            ConfigurationSection teamBorders = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS);
+            if (teamBorders != null) {
+                Set<String> teamNames = teamBorders.getKeys(false);
+                for (String teamName : teamNames) {
+                    if (playerTeam.getName().equals(teamName)) {
+
+                        ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS + "." + teamName);
+                        if (teamBorder != null) {
+                            WorldBorder worldBorder = Bukkit.createWorldBorder();
+                            double x = teamBorder.getDouble("x");
+                            double z = teamBorder.getDouble("z");
+                            double size = teamBorder.getDouble("size");
+
+                            plugin.getLogger().info("Setting world border for " + player.getName() + " to "
+                                    + x + ", "
+                                    + z + ", "
+                                    + size + ".");
+
+                            worldBorder.setCenter(x, z);
+                            worldBorder.setSize(size);
+
+                            player.setWorldBorder(worldBorder);
+                        }
+
+                    }
+                }
+            }
+        }
     }
 }

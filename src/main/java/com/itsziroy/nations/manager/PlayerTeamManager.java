@@ -1,10 +1,10 @@
 package com.itsziroy.nations.manager;
 import com.itsziroy.nations.Nations;
 import com.itsziroy.nations.util.PlayerTeam;
-import org.bukkit.Bukkit;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,16 +20,19 @@ public class PlayerTeamManager {
         this.plugin = plugin;
     }
 
-    public void load() {
-        try (BufferedReader br = new BufferedReader(new FileReader(this.plugin.getDataFolder() + "players.csv"))) {
+    public void load() throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(this.plugin.getDataFolder() + "/players.csv"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(COMMA_DELIMITER);
                 playerTeams.add(new PlayerTeam(values[0], values[1]));
             }
-        } catch (Exception e) {
-
         }
+    }
+
+    public void reload() throws IOException {
+        this.playerTeams.clear();
+        this.load();
     }
 
     public List<PlayerTeam> getPlayerTeams() {

@@ -8,7 +8,7 @@ depend:
   - DiscordSRV
 
 commands:
-  nation:
+  nations:
     permission: nations.default
     description: "Nation command"
 permissions:
@@ -20,4 +20,10 @@ permissions:
   nations.bypass.team_borders:
     description: "Bypass the team world borders"
     default: "op"
+  nations.bypass.enforce_teams:
+    description: "Bypasses Team enforcement"
+  nations.bypass.random_spawn:
+    description: "Won't randomly spawn player on first join"
+  nations.bypass.event_start:
+    description: "Allows you to join even if event is not started yet."
 

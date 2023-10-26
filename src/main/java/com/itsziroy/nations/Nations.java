@@ -13,8 +13,10 @@ import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.ScoreboardManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public final class Nations extends JavaPlugin {
@@ -47,12 +49,20 @@ public final class Nations extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
-        playerTeamManager.load();
+
+        try {
+            playerTeamManager.load();
+        } catch (IOException e) {
+            getLogger().warning("Player file could not be loaded!");
+            throw new RuntimeException(e);
+        }
+
 
 
 
         registerConfig();
         setGameRules();
+        registerTeams();
 
     }
 
@@ -110,6 +120,40 @@ public final class Nations extends JavaPlugin {
 
                     }
                 }
+            }
+        }
+    }
+
+    public Calendar getEventStartDate() {
+        String date = this.getConfig().getString(Config.Path.EVENT_START_DATE);
+        String time = this.getConfig().getString(Config.Path.EVENT_START_TIME);
+        if (date != null && time != null) {
+            Calendar calendar = Calendar.getInstance();
+            Calendar currentCalendar = Calendar.getInstance();
+
+
+            int[] dateArray = Arrays.stream(date.split("-")).mapToInt(Integer::parseInt).toArray();
+            int[] timeArray = Arrays.stream(time.split(":")).mapToInt(Integer::parseInt).toArray();
+
+            calendar.set(Calendar.YEAR, dateArray[0]);
+            calendar.set(Calendar.MONTH, dateArray[1] - 1);
+            calendar.set(Calendar.DAY_OF_MONTH, dateArray[2]);
+            calendar.set(Calendar.HOUR_OF_DAY, timeArray[0]);
+            calendar.set(Calendar.MINUTE, timeArray[1]);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+
+            return calendar;
+        } else {
+            return null;
+        }
+    }
+
+    public void registerTeams() {
+        for(String team : this.getConfig().getStringList(Config.Path.TEAMS)) {
+            ScoreboardManager manager = Bukkit.getScoreboardManager();
+            if (manager != null && manager.getMainScoreboard().getTeam(team) == null) {
+                manager.getMainScoreboard().registerNewTeam(team);
             }
         }
     }

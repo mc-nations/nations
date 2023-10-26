@@ -5,11 +5,11 @@ import com.itsziroy.nations.Nations;
 import com.itsziroy.servertimelock.ServerTimeLock;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Calendar;
 
 
@@ -21,33 +21,21 @@ public class ServerListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerListPing(ServerListPingEvent event) {
 
         boolean enabled = this.plugin.getConfig().getBoolean(Config.Path.MOTD_COUNTDOWN);
 
         if(enabled) {
-            String date = this.plugin.getConfig().getString(Config.Path.EVENT_START_DATE);
-            String time = this.plugin.getConfig().getString(Config.Path.EVENT_START_TIME);
-            if (date != null && time != null) {
-                Calendar calendar = Calendar.getInstance();
+            Calendar eventStartDate = this.plugin.getEventStartDate();
+            if (eventStartDate != null) {
+
                 Calendar currentCalendar = Calendar.getInstance();
 
 
-                int[] dateArray = Arrays.stream(date.split("-")).mapToInt(Integer::parseInt).toArray();
-                int[] timeArray =  Arrays.stream(time.split(":")).mapToInt(Integer::parseInt).toArray();
+                long diff = eventStartDate.getTimeInMillis() - currentCalendar.getTimeInMillis();
 
-                calendar.set(Calendar.YEAR, dateArray[0]);
-                calendar.set(Calendar.MONTH, dateArray[1] - 1);
-                calendar.set(Calendar.DAY_OF_MONTH, dateArray[2]);
-                calendar.set(Calendar.HOUR_OF_DAY, timeArray[0]);
-                calendar.set(Calendar.MINUTE, timeArray[1]);
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MILLISECOND, 0);
-
-                long diff = calendar.getTimeInMillis() - currentCalendar.getTimeInMillis();
-
-                if(diff < 0) {
+                if(diff > 0) {
                     Duration duration = Duration.ofMillis(diff);
 
                     event.setMotd(ChatColor.DARK_PURPLE + "Minecraft Nations " + ChatColor.GRAY + "startet in " + durationToFormattedString(duration) + ".");

@@ -1,6 +1,7 @@
 event_start:
   date: "2023-11-04"
   time: "10:00"
+  disable_join: true
 
 motd_countdown: true
 
@@ -15,7 +16,10 @@ game_rules:
     reducedDebugInfo: true
     showCoordinates: false
 
+teams: ["schnee", "wueste", "dschungel"]
 
+enforce_teams: true
+enable_random_spawn: true
 
 spawn_exclusion:
   max_height:

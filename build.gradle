@@ -16,7 +16,12 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
     maven { url = "https://repo.aikar.co/content/groups/aikar/" }
+    maven { url 'https://nexus.scarsz.me/content/groups/public/' }
     flatDir {
         dirs '../server-time-lock/build/libs'
     }
