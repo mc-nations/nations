@@ -3,6 +3,7 @@ package com.itsziroy.nations.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Subcommand;
 import com.itsziroy.nations.Config;
 import com.itsziroy.nations.Util;
@@ -13,11 +14,15 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @CommandAlias("nations|n")
+@CommandPermission("nations.default")
 public class NationsCommand extends BaseCommand {
 
     private final com.itsziroy.nations.Nations plugin;
@@ -36,11 +41,11 @@ public class NationsCommand extends BaseCommand {
             teamNameArg = args[1].replace("@", "");
         }
 
-        ConfigurationSection teamBorders = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS);
-        if (teamBorders != null) {
-            for (String teamName : teamBorders.getKeys(false)) {
+        ConfigurationSection teams = plugin.getConfig().getConfigurationSection(Config.Path.TEAMS);
+        if (teams != null) {
+            for (String teamName : teams.getKeys(false)) {
                 if (Objects.equals(teamName, teamNameArg)) {
-                    ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS + "." + teamName);
+                    ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.Team.border(teamName));
                     if (teamBorder != null) {
                         if (player != null) {
                             double x = teamBorder.getDouble("x");
@@ -77,6 +82,34 @@ public class NationsCommand extends BaseCommand {
                 message.append(" - ").append(offlinePlayer.getName()).append(";").append(playerTeam.team());
             }
             player.sendMessage(message.toString());
+        }
+
+        @Subcommand("remove")
+        @CommandCompletion("@teams|all")
+        public void onRemoveAllTeams(Player player, String[] args) {
+
+            if(args[0].equals("all")) {
+                ConfigurationSection teams = plugin.getConfig().getConfigurationSection(Config.Path.TEAMS);
+                if(teams != null) {
+                    for (String scoreBoardTeam : teams.getKeys(false)) {
+                        Team team = player.getScoreboard().getTeam(scoreBoardTeam);
+                        if (team != null) {
+                            team.unregister();
+                        }
+                    }
+                    player.sendMessage(ChatColor.GREEN + "Removed all teams!");
+                } else {
+                    player.sendMessage(ChatColor.RED + "Removal failed.");
+                }
+            } else {
+                Team team = player.getScoreboard().getTeam(args[0].replace("@", ""));
+                if(team != null) {
+                    team.unregister();
+                    player.sendMessage(ChatColor.GREEN +"Removed " + args[0].replace("@", ""));
+                } else {
+                    player.sendMessage(ChatColor.RED +"Team not found!");
+                }
+            }
         }
     }
 }

@@ -42,7 +42,7 @@ public class PlayerListener implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onFirstJoin(PlayerJoinEvent event) {
         if(this.plugin.getConfig().getBoolean(Config.Path.ENABLE_RANDOM_SPAWN)) {
             Player player = event.getPlayer();
@@ -65,6 +65,7 @@ public class PlayerListener implements Listener {
                         Location spawnLocation = findSafeSpawnLocation(player, team);
                         // Spieler teleportieren
                         player.teleport(spawnLocation);
+                        player.setBedSpawnLocation(spawnLocation, true);
 
                         // 5 gegartes Rindfleisch ins Inventar
                         ItemStack cookedBeef = new ItemStack(Material.COOKED_BEEF, 5);
@@ -87,8 +88,9 @@ public class PlayerListener implements Listener {
             }
         }
     }
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerLoginEvent event) {
+
         // Check if event started or not
         if(!event.getPlayer().hasPermission(Permission.BYPASS_EVENT_START)) {
             if (this.plugin.getConfig().getBoolean(Config.Path.EVENT_START_DISABLE_JOIN)) {
@@ -120,7 +122,7 @@ public class PlayerListener implements Listener {
     private Location findSafeSpawnLocation(Player player, String team) {
 
 
-        ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS + "." + team);
+        ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.Team.border(team));
         ConfigurationSection spawn_exlusion = plugin.getConfig().getConfigurationSection(Config.Path.SPAWN_EXLCUSION );
 
 
@@ -207,34 +209,23 @@ public class PlayerListener implements Listener {
     public void setWorldBorder(Player player) {
         Team playerTeam = getScoreboardTeamForPlayer(player);
 
-
         if (playerTeam != null) {
-            ConfigurationSection teamBorders = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS);
-            if (teamBorders != null) {
-                Set<String> teamNames = teamBorders.getKeys(false);
-                for (String teamName : teamNames) {
-                    if (playerTeam.getName().equals(teamName)) {
+            ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.Team.border(playerTeam.toString()));
+            if (teamBorder != null) {
+                WorldBorder worldBorder = Bukkit.createWorldBorder();
+                double x = teamBorder.getDouble("x");
+                double z = teamBorder.getDouble("z");
+                double size = teamBorder.getDouble("size");
 
-                        ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS + "." + teamName);
-                        if (teamBorder != null) {
-                            WorldBorder worldBorder = Bukkit.createWorldBorder();
-                            double x = teamBorder.getDouble("x");
-                            double z = teamBorder.getDouble("z");
-                            double size = teamBorder.getDouble("size");
+                plugin.getLogger().info("Setting world border for " + player.getName() + " to "
+                        + x + ", "
+                        + z + ", "
+                        + size + ".");
 
-                            plugin.getLogger().info("Setting world border for " + player.getName() + " to "
-                                    + x + ", "
-                                    + z + ", "
-                                    + size + ".");
+                worldBorder.setCenter(x, z);
+                worldBorder.setSize(size);
 
-                            worldBorder.setCenter(x, z);
-                            worldBorder.setSize(size);
-
-                            player.setWorldBorder(worldBorder);
-                        }
-
-                    }
-                }
+                player.setWorldBorder(worldBorder);
             }
         }
     }

@@ -14,9 +14,9 @@ public final class TabCompletions {
         manager.getCommandCompletions().registerCompletion("teams", c -> {
 
             Set<String> completions = new HashSet<>();
-            ConfigurationSection teamBorders = plugin.getConfig().getConfigurationSection(Config.Path.TEAM_BORDERS_TEAMS);
-            if (teamBorders != null) {
-                completions.addAll(teamBorders.getKeys(false).stream().map(s -> "@" + s).toList());
+            ConfigurationSection teams = plugin.getConfig().getConfigurationSection(Config.Path.TEAMS);
+            if (teams != null) {
+                completions.addAll(teams.getKeys(false).stream().map(s -> "@" + s).toList());
             }
             return completions;
         });

@@ -16,10 +16,32 @@ game_rules:
     reducedDebugInfo: true
     showCoordinates: false
 
-teams: ["schnee", "wueste", "dschungel"]
+teams:
+  schnee:
+    color: "WHITE"
+    prefix: "Schnee "
+    border:
+      x: -1792
+      z: -1792
+      size: 2560
+  wueste:
+    color: "YELLOW"
+    prefix: "Wüste "
+    border:
+      x: 1792
+      z: -1792
+      size: 2560
+  dschungel:
+    color: "GREEN"
+    prefix: "Dschungel "
+    border:
+      x: 0
+      z: 1792
+      size: 2560
 
 enforce_teams: true
 enable_random_spawn: true
+team_borders: true
 
 spawn_exclusion:
   max_height:
@@ -30,19 +52,3 @@ spawn_exclusion:
       - x: 8
         z: 2010
         size: 200
-
-team_borders:
-  enabled: true
-  teams:
-    wueste:
-      x: 1792
-      z: -1792
-      size: 2560
-    schnee:
-      x: -1792
-      z: -1792
-      size: 2560
-    dschungel:
-      x: 0
-      z: 1792
-      size: 2560

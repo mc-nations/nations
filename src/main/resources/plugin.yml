@@ -6,14 +6,17 @@ api-version: '1.20'
 depend:
   - ServerTimeLock
   - DiscordSRV
+softdepend:
+  - PlaceholderAPI
 
 commands:
   nations:
-    permission: nations.default
+    permission: "nations.default"
     description: "Nation command"
 permissions:
   nations.*:
     description: "All Nations permissions"
+    default: "op"
   nations.default:
     description: "Default permission"
     default: "op"
@@ -22,8 +25,11 @@ permissions:
     default: "op"
   nations.bypass.enforce_teams:
     description: "Bypasses Team enforcement"
+    default: "op"
   nations.bypass.random_spawn:
     description: "Won't randomly spawn player on first join"
+    default: "op"
   nations.bypass.event_start:
     description: "Allows you to join even if event is not started yet."
+    default: "op"
 

@@ -12,11 +12,24 @@ public interface Config {
 
         String TEAMS = "teams";
 
-        String EVENT_START_DISABLE_JOIN = "event_start.disable_join";
-        String TEAM_BORDERS = "team_borders";
-        String TEAM_BORDERS_TEAMS = "team_borders.teams";
+        interface Team {
+            static String color(String teamName) {
+                return "teams." + teamName + ".color";
+            }
 
-        String TEAM_BORDERS_ENABLED = "team_borders.enabled";
+            static String border(String teamName) {
+                return "teams." + teamName + "." + "border";
+            }
+
+            static String prefix(String teamName) {
+                return "teams." + teamName + "." + "prefix";
+            }
+        }
+
+        String TEAM_BORDERS_ENABLED = "team_borders";
+
+        String EVENT_START_DISABLE_JOIN = "event_start.disable_join";
+
 
         String SPAWN_EXLCUSION = "spawn_exclusion";
         String SPAWN_EXLCUSION_MAX_HEIGHT = "spawn_exclusion.max_height";

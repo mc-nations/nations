@@ -6,14 +6,17 @@ import com.itsziroy.nations.commands.TabCompletions;
 import com.itsziroy.nations.listeners.PlayerListener;
 import com.itsziroy.nations.listeners.ServerListener;
 import com.itsziroy.nations.manager.PlayerTeamManager;
+import com.itsziroy.nations.util.PlaceholderAPIExpansion;
 import com.itsziroy.servertimelock.ServerTimeLock;
 import github.scarsz.discordsrv.DiscordSRV;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +66,14 @@ public final class Nations extends JavaPlugin {
         registerConfig();
         setGameRules();
         registerTeams();
+
+        // Small check to make sure that PlaceholderAPI is installed
+        this.getLogger().info("helllllo");
+        this.getLogger().info(Bukkit.getPluginManager().getPlugin("PlaceholderAPI").toString());
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            getLogger().info("Hooked into Placeholder API.");
+            new PlaceholderAPIExpansion(this).register();
+        }
 
     }
 
@@ -150,10 +161,15 @@ public final class Nations extends JavaPlugin {
     }
 
     public void registerTeams() {
-        for(String team : this.getConfig().getStringList(Config.Path.TEAMS)) {
-            ScoreboardManager manager = Bukkit.getScoreboardManager();
-            if (manager != null && manager.getMainScoreboard().getTeam(team) == null) {
-                manager.getMainScoreboard().registerNewTeam(team);
+        ConfigurationSection teamsConfig = this.getConfig().getConfigurationSection(Config.Path.TEAMS);
+        if(teamsConfig != null) {
+            for (String team : teamsConfig.getKeys(false)) {
+                ScoreboardManager manager = Bukkit.getScoreboardManager();
+                if (manager != null && manager.getMainScoreboard().getTeam(team) == null) {
+                    Team scoreboardTeam = manager.getMainScoreboard().registerNewTeam(team);
+                    String teamColor = this.getConfig().getString(Config.Path.Team.color(team));
+                    if(teamColor != null) scoreboardTeam.setColor(ChatColor.valueOf(teamColor));
+                }
             }
         }
     }
