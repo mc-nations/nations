@@ -43,6 +43,8 @@ enforce_teams: true
 enable_random_spawn: true
 team_borders: true
 
+disable_mending: true
+
 spawn_exclusion:
   max_height:
     schnee: 100

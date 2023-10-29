@@ -3,6 +3,7 @@ package com.itsziroy.nations;
 import co.aikar.commands.PaperCommandManager;
 import com.itsziroy.nations.commands.Commands;
 import com.itsziroy.nations.commands.TabCompletions;
+import com.itsziroy.nations.listeners.AnvilListener;
 import com.itsziroy.nations.listeners.PlayerListener;
 import com.itsziroy.nations.listeners.ServerListener;
 import com.itsziroy.nations.manager.PlayerTeamManager;
@@ -51,6 +52,8 @@ public final class Nations extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new AnvilListener(this), this);
+
 
 
         try {
@@ -140,8 +143,6 @@ public final class Nations extends JavaPlugin {
         String time = this.getConfig().getString(Config.Path.EVENT_START_TIME);
         if (date != null && time != null) {
             Calendar calendar = Calendar.getInstance();
-            Calendar currentCalendar = Calendar.getInstance();
-
 
             int[] dateArray = Arrays.stream(date.split("-")).mapToInt(Integer::parseInt).toArray();
             int[] timeArray = Arrays.stream(time.split(":")).mapToInt(Integer::parseInt).toArray();

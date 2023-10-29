@@ -39,6 +39,8 @@ public interface Config {
         String ENFORCE_TEAMS = "enforce_teams";
         String ENABLE_RANDOM_SPAWN = "enable_random_spawn";
 
+        String DISABLE_MENDING = "disable_mending";
+
 
     }
 
