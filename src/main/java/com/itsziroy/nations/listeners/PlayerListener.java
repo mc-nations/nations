@@ -210,7 +210,7 @@ public class PlayerListener implements Listener {
         Team playerTeam = getScoreboardTeamForPlayer(player);
 
         if (playerTeam != null) {
-            ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.Team.border(playerTeam.toString()));
+            ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.Team.border(playerTeam.getName()));
             if (teamBorder != null) {
                 WorldBorder worldBorder = Bukkit.createWorldBorder();
                 double x = teamBorder.getDouble("x");
