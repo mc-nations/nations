@@ -30,6 +30,8 @@ public class PlayerTeamManager {
                 String[] values = line.split(delimiter);
                 playerTeams.add(new PlayerTeam(values[0], values[1]));
             }
+        } catch (IOException e) {
+            this.plugin.getLogger().warning("PlayerTeam File "+ csvPath + " could not be loaded!");
         }
     }
 
