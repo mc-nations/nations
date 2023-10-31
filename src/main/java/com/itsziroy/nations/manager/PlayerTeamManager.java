@@ -12,7 +12,6 @@ import java.util.UUID;
 
 public class PlayerTeamManager {
 
-    private final String COMMA_DELIMITER = ";";
     private final Nations plugin;
 
     private final List<PlayerTeam> playerTeams = new ArrayList<>();
@@ -24,7 +23,7 @@ public class PlayerTeamManager {
     public void load() throws IOException {
         String csvPath = this.plugin.getConfig().getString(Config.Path.PLAYER_CSV_FILE);
         String delimiter = this.plugin.getConfig().getString(Config.Path.PLAYER_CSV_DELIMITER);
-        try (BufferedReader br = new BufferedReader(new FileReader(this.plugin.getDataFolder() + csvPath))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(this.plugin.getDataFolder() + "/" + csvPath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 assert delimiter != null;

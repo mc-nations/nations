@@ -14,8 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Objects;
@@ -78,8 +76,13 @@ public class NationsCommand extends BaseCommand {
             StringBuilder message = new StringBuilder();
             for(PlayerTeam playerTeam: plugin.getPlayerTeamManager().getPlayerTeams()) {
                 UUID uuid = plugin.getDiscordSRV().getAccountLinkManager().getUuid(playerTeam.discordId());
-                OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(uuid);
-                message.append(" - ").append(offlinePlayer.getName()).append(";").append(playerTeam.team());
+                if(uuid != null) {
+                    OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(uuid);
+                    message.append(" - ").append(offlinePlayer.getName()).append(";").append(playerTeam.team());
+                } else {
+                    message.append(" - ").append("NotJoined:").append(playerTeam.discordId()).append(";").append(playerTeam.team());
+                }
+
             }
             player.sendMessage(message.toString());
         }
