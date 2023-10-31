@@ -41,6 +41,8 @@ public interface Config {
 
         String DISABLE_MENDING = "disable_mending";
 
+        String PLAYER_CSV_FILE = "player_csv_file";
+        String PLAYER_CSV_DELIMITER = "player_csv_delimiter";
 
     }
 

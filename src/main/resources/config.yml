@@ -16,6 +16,9 @@ game_rules:
     reducedDebugInfo: true
     showCoordinates: false
 
+player_csv_file: "players.csv"
+player_csv_delimiter: ";"
+
 teams:
   schnee:
     color: "WHITE"

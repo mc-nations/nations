@@ -1,4 +1,5 @@
 package com.itsziroy.nations.manager;
+import com.itsziroy.nations.Config;
 import com.itsziroy.nations.Nations;
 import com.itsziroy.nations.util.PlayerTeam;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 public class PlayerTeamManager {
 
-    private static final String COMMA_DELIMITER = ";";
+    private final String COMMA_DELIMITER = ";";
     private final Nations plugin;
 
     private final List<PlayerTeam> playerTeams = new ArrayList<>();
@@ -21,10 +22,13 @@ public class PlayerTeamManager {
     }
 
     public void load() throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(this.plugin.getDataFolder() + "/players.csv"))) {
+        String csvPath = this.plugin.getConfig().getString(Config.Path.PLAYER_CSV_FILE);
+        String delimiter = this.plugin.getConfig().getString(Config.Path.PLAYER_CSV_DELIMITER);
+        try (BufferedReader br = new BufferedReader(new FileReader(this.plugin.getDataFolder() + csvPath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(COMMA_DELIMITER);
+                assert delimiter != null;
+                String[] values = line.split(delimiter);
                 playerTeams.add(new PlayerTeam(values[0], values[1]));
             }
         }
