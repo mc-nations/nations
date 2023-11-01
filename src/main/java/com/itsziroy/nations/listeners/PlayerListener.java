@@ -98,6 +98,7 @@ public class PlayerListener implements Listener {
                     long diff = this.plugin.getEventStartDate().getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
                     if (diff > 0) {
                         event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Das Event ist noch nicht gestartet!");
+                        return;
                     }
                 }
             }
