@@ -2,6 +2,13 @@ package com.itsziroy.nations.manager;
 import com.itsziroy.nations.Config;
 import com.itsziroy.nations.Nations;
 import com.itsziroy.nations.util.PlayerTeam;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.WorldBorder;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.itsziroy.nations.Util.getScoreboardTeamForPlayer;
 
 public class PlayerTeamManager {
 
@@ -55,5 +64,43 @@ public class PlayerTeamManager {
             }
         }
         return null;
+    }
+
+    public void registerTeams() {
+        ConfigurationSection teamsConfig = this.plugin.getConfig().getConfigurationSection(Config.Path.TEAMS);
+        if(teamsConfig != null) {
+            for (String team : teamsConfig.getKeys(false)) {
+                ScoreboardManager manager = Bukkit.getScoreboardManager();
+                if (manager != null && manager.getMainScoreboard().getTeam(team) == null) {
+                    Team scoreboardTeam = manager.getMainScoreboard().registerNewTeam(team);
+                    String teamColor = this.plugin.getConfig().getString(Config.Path.Team.color(team));
+                    if(teamColor != null) scoreboardTeam.setColor(ChatColor.valueOf(teamColor));
+                }
+            }
+        }
+    }
+
+    public void setWorldBorderForPlayer(Player player) {
+        Team playerTeam = getScoreboardTeamForPlayer(player);
+
+        if (playerTeam != null) {
+            ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.Team.border(playerTeam.getName()));
+            if (teamBorder != null) {
+                WorldBorder worldBorder = Bukkit.createWorldBorder();
+                double x = teamBorder.getDouble("x");
+                double z = teamBorder.getDouble("z");
+                double size = teamBorder.getDouble("size");
+
+                plugin.getLogger().info("Setting world border for " + player.getName() + " to "
+                        + x + ", "
+                        + z + ", "
+                        + size + ".");
+
+                worldBorder.setCenter(x, z);
+                worldBorder.setSize(size);
+
+                player.setWorldBorder(worldBorder);
+            }
+        }
     }
 }

@@ -14,12 +14,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.scoreboard.Team;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import static com.itsziroy.nations.Util.addPlayerToScoreboardTeam;
+import static com.itsziroy.nations.Util.getScoreboardTeamForPlayer;
 
 public class PlayerListener implements Listener {
 
@@ -34,7 +35,7 @@ public class PlayerListener implements Listener {
     public void onPlayerJoinSetWorldBorder(PlayerJoinEvent event) {
         if (plugin.getConfig().getBoolean(Config.Path.TEAM_BORDERS_ENABLED)) {
             if (!event.getPlayer().hasPermission(Permission.BYPASS_TEAM_BORDERS)) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> setWorldBorder(event.getPlayer()), 10);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getPlayerTeamManager().setWorldBorderForPlayer(event.getPlayer()), 10);
             } else {
                 plugin.getLogger().info("Player " + event.getPlayer().getName() + " has permission to bypass team borders.");
             }
@@ -44,24 +45,23 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onFirstJoin(PlayerJoinEvent event) {
-        if(this.plugin.getConfig().getBoolean(Config.Path.ENABLE_RANDOM_SPAWN)) {
-            Player player = event.getPlayer();
-            if(!player.hasPermission(Permission.BYPASS_RANDOM_SPAWN)) {
-                String discordId = this.plugin.getDiscordSRV().getAccountLinkManager().getDiscordId(player.getUniqueId());
+        Player player = event.getPlayer();
+        String discordId = this.plugin.getDiscordSRV().getAccountLinkManager().getDiscordId(player.getUniqueId());
 
-                String team = this.plugin.getPlayerTeamManager().getTeamForPlayer(discordId);
-                Bukkit.getLogger().info("Player " + player.getName() + " joined with discord id " + discordId + " and team " + team);
-                if (team != null) {
-                    if (getScoreboardTeamForPlayer(player) == null) {
+        String team = this.plugin.getPlayerTeamManager().getTeamForPlayer(discordId);
+        Bukkit.getLogger().info("Player " + player.getName() + " joined with discord id " + discordId + " and team " + team);
+        if (team != null) {
+            if (getScoreboardTeamForPlayer(player) == null) {
 
-                        Bukkit.getScheduler().runTaskLater(this.plugin, () -> addPlayerToScoreboardTeam(player, team), 10);
+                Bukkit.getScheduler().runTaskLater(this.plugin, () -> addPlayerToScoreboardTeam(player, team), 10);
 
-                        if (!event.getPlayer().hasPermission(Permission.BYPASS_TEAM_BORDERS)) {
-                            Bukkit.getScheduler().runTaskLater(plugin, () -> setWorldBorder(player), 20);
-                        } else {
-                            plugin.getLogger().info("Player " + event.getPlayer().getName() + " has permission to bypass team borders.");
-                        }
-
+                if (!event.getPlayer().hasPermission(Permission.BYPASS_TEAM_BORDERS)) {
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getPlayerTeamManager().setWorldBorderForPlayer(player), 20);
+                } else {
+                    plugin.getLogger().info("Player " + event.getPlayer().getName() + " has permission to bypass team borders.");
+                }
+                if (this.plugin.getConfig().getBoolean(Config.Path.ENABLE_RANDOM_SPAWN)) {
+                    if (!player.hasPermission(Permission.BYPASS_RANDOM_SPAWN)) {
                         Location spawnLocation = findSafeSpawnLocation(player, team);
                         // Spieler teleportieren
                         player.teleport(spawnLocation);
@@ -80,11 +80,10 @@ public class PlayerListener implements Listener {
                         book.setItemMeta(bookMeta);
 
                         player.getInventory().addItem(book);
-
+                    } else {
+                        plugin.getLogger().info("Player " + player.getName() + " bypasses random spawns.");
                     }
                 }
-            } else {
-                plugin.getLogger().info("Player " + player.getName() + " bypasses random spawns.");
             }
         }
     }
@@ -182,52 +181,5 @@ public class PlayerListener implements Listener {
         }
 
         return new Location(player.getWorld(), x, y+1, z);
-    }
-
-
-
-    public void addPlayerToScoreboardTeam(Player player, String name) {
-        Set<Team> teams = player.getScoreboard().getTeams();
-        for (Team team : teams) {
-            if (team.getName().equals(name)) {
-                team.addEntry(player.getName());
-            }
-        }
-    }
-
-
-    public Team getScoreboardTeamForPlayer(Player player) {
-        Set<Team> teams = player.getScoreboard().getTeams();
-
-        for (Team team : teams) {
-            if (team.hasEntry(player.getName())) {
-                return team;
-            }
-        }
-        return null;
-    }
-
-    public void setWorldBorder(Player player) {
-        Team playerTeam = getScoreboardTeamForPlayer(player);
-
-        if (playerTeam != null) {
-            ConfigurationSection teamBorder = plugin.getConfig().getConfigurationSection(Config.Path.Team.border(playerTeam.getName()));
-            if (teamBorder != null) {
-                WorldBorder worldBorder = Bukkit.createWorldBorder();
-                double x = teamBorder.getDouble("x");
-                double z = teamBorder.getDouble("z");
-                double size = teamBorder.getDouble("size");
-
-                plugin.getLogger().info("Setting world border for " + player.getName() + " to "
-                        + x + ", "
-                        + z + ", "
-                        + size + ".");
-
-                worldBorder.setCenter(x, z);
-                worldBorder.setSize(size);
-
-                player.setWorldBorder(worldBorder);
-            }
-        }
     }
 }

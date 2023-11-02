@@ -114,5 +114,11 @@ public class NationsCommand extends BaseCommand {
                 }
             }
         }
+
+        @Subcommand("register")
+        public void onRegisterTeams(Player player) {
+            plugin.getPlayerTeamManager().registerTeams();
+            player.sendMessage(ChatColor.GREEN + "Registered all teams!");
+        }
     }
 }
