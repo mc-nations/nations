@@ -1,10 +1,7 @@
 package com.itsziroy.nations.commands;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandCompletion;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import com.itsziroy.nations.Config;
 import com.itsziroy.nations.Util;
 import com.itsziroy.nations.util.PlayerTeam;
@@ -89,36 +86,46 @@ public class NationsCommand extends BaseCommand {
 
         @Subcommand("remove")
         @CommandCompletion("@teams|all")
-        public void onRemoveAllTeams(Player player, String[] args) {
+        public void onRemoveAllTeams(@Optional Player player, String[] args) {
 
             if(args[0].equals("all")) {
                 ConfigurationSection teams = plugin.getConfig().getConfigurationSection(Config.Path.TEAMS);
                 if(teams != null) {
                     for (String scoreBoardTeam : teams.getKeys(false)) {
-                        Team team = player.getScoreboard().getTeam(scoreBoardTeam);
+                        Team team = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard().getTeam(scoreBoardTeam);
                         if (team != null) {
                             team.unregister();
                         }
                     }
-                    player.sendMessage(ChatColor.GREEN + "Removed all teams!");
+                    if(player != null) {
+                        player.sendMessage(ChatColor.GREEN + "Removed all teams!");
+                    }
                 } else {
-                    player.sendMessage(ChatColor.RED + "Removal failed.");
+                    if(player != null) {
+                        player.sendMessage(ChatColor.RED + "Removal failed.");
+                    }
                 }
             } else {
-                Team team = player.getScoreboard().getTeam(args[0].replace("@", ""));
+                Team team = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard().getTeam(args[0].replace("@", ""));
                 if(team != null) {
                     team.unregister();
-                    player.sendMessage(ChatColor.GREEN +"Removed " + args[0].replace("@", ""));
+                    if(player != null) {
+                        player.sendMessage(ChatColor.GREEN + "Removed " + args[0].replace("@", ""));
+                    }
                 } else {
-                    player.sendMessage(ChatColor.RED +"Team not found!");
+                    if(player != null) {
+                        player.sendMessage(ChatColor.RED + "Team not found!");
+                    }
                 }
             }
         }
 
         @Subcommand("register")
-        public void onRegisterTeams(Player player) {
+        public void onRegisterTeams(@Optional Player player) {
             plugin.getPlayerTeamManager().registerTeams();
-            player.sendMessage(ChatColor.GREEN + "Registered all teams!");
+            if(player != null) {
+                player.sendMessage(ChatColor.GREEN + "Registered all teams!");
+            }
         }
     }
 }
