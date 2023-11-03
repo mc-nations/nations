@@ -61,28 +61,64 @@ public class PlayerListener implements Listener {
                     plugin.getLogger().info("Player " + event.getPlayer().getName() + " has permission to bypass team borders.");
                 }
                 if (this.plugin.getConfig().getBoolean(Config.Path.ENABLE_RANDOM_SPAWN)) {
-                    if (!player.hasPermission(Permission.BYPASS_RANDOM_SPAWN)) {
-                        Location spawnLocation = findSafeSpawnLocation(player, team);
-                        // Spieler teleportieren
-                        player.teleport(spawnLocation);
-                        player.setBedSpawnLocation(spawnLocation, true);
+                    if (!event.getPlayer().hasPermission(Permission.BYPASS_RANDOM_SPAWN)) {
+                        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+                            this.plugin.getLogger().info("Teleporting player " + player.getName() + " to random spawn.");
+                            Location spawnLocation = findSafeSpawnLocation(player, team);
+                            // Spieler teleportieren
+                            player.teleport(spawnLocation);
+                            player.setBedSpawnLocation(spawnLocation, true);
 
-                        // 5 gegartes Rindfleisch ins Inventar
-                        ItemStack cookedBeef = new ItemStack(Material.COOKED_BEEF, 5);
-                        player.getInventory().addItem(cookedBeef);
+                            // 5 gegartes Rindfleisch ins Inventar
+                            ItemStack cookedBeef = new ItemStack(Material.COOKED_BEEF, 5);
+                            player.getInventory().addItem(cookedBeef);
 
-                        // Buch erstellen
-                        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
-                        BookMeta bookMeta = (BookMeta) book.getItemMeta();
-                        bookMeta.setTitle("Mein Buch");
-                        bookMeta.setAuthor("Dein Server");
-                        bookMeta.addPage(ChatColor.BLACK + "Hier Text einfügen");
-                        book.setItemMeta(bookMeta);
+                            // Buch erstellen
+                            ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+                            BookMeta bookMeta = (BookMeta) book.getItemMeta();
+                            bookMeta.setTitle("Minecraft Nations");
+                            bookMeta.setAuthor("Dein Server");
+                            bookMeta.addPage(ChatColor.DARK_PURPLE + "Willkommen bei Minecraft Nations!" +
+                                    "\n\n" + ChatColor.BLACK +
+                                    "Diese Welt ist nicht ungef\u00e4hrlich. Hier ein paar Informationen, f\u00dcr den Fall, dass du noch keine gro\u00DFen Erfahrungen mit dem Spiel Minecraft gemacht hast:\n" +
+                                            "Such dir am besten eine Gruppe, wo du",
+                                    "erstmal mitmachen kannst, um deine \u00dcberlebenschancen zu erh\u00f6hen. " +
+                                            "Ohne Essen regenerierst du keine Herzen. " +
+                                            "Wir spielen anfangs auf der Schwierigkeit Mittel und nach 2 Tagen auf Hard! " +
+                                            "Bitte beachte, dass die Mobs in H\u00f6hlen und bei Nacht sehr gef\u00e4hrlich sein ",
+                                            "k\u00f6nnen. Ein Schild ist dein bester Freund um Pfeile und andere Attacken von Mobs zu blocken. \n\n" +
+                                            "PROXIMITY CHAT IST PFLICHT ZU NUTZEN. \n\n" +
+                                            "Wir w\u00fcnschen dir viel Erfolg und eine abenteuerliche Zeit bei dem Projekt Nations! ",
+                                    ChatColor.DARK_PURPLE + "Lore\n\n" + ChatColor.BLACK +
+                                    "In den Tiefen der Minecraft-Welt existierten einst drei antike, mythische Nationen: "+
+                                            "die Nation des Schnees, die Nation der W\u00fcste und die Nation des Dschungels. "+
+                                            "Diese Nationen lebten im Einklang mit einer \u00fcbernat\u00fcrlichen kosmischen Macht, die das Gleichgewicht in ihrer Welt aufrechterhielt",
+                                    "Die Nation des Schnees erstreckte sich \u00fcber endlose verschneite Ebenen und majest\u00e4tische Berge. "+
+                                    "Ihre Bewohner waren bekannt f\u00fcr ihre Weisheit und ihre F\u00e4higkeit, die Mysterien des Eises zu beherrschen. Die Nation der W\u00fcste bl\u00fchte inmitten riesiger",
+                                    "Sandd\u00fcnen und versteckter Oasen. Sie waren geschickte Handwerker und H\u00e4ndler, die die W\u00fcstenressourcen meisterhaft nutzten. Die Nation des Dschungels erstreckte sich durch undurchdringliche W\u00e4lder, in denen die Natur in voller Pracht erbl\u00fchte. " +
+                                            "Jede Nation hatte ihre einzigartige Kultur und",
+                                    "Traditionen, aber sie alle teilten eine tiefe Verehrung f\u00fcr die kosmische Macht der Titanen, die \u00fcber ihre Welt wachte. Dies sorgte f\u00fcr Harmonie zwischen den Nationen und sch\u00fctzte sie vor Bedrohungen von au\u00DFen.\n" +
+                                            "Jedoch hielt diese Harmonie nicht lange ",
+                                    "und unter Einfluss einer dunklen Macht, welche Zwietracht zwischen den Nationen s\u00e4te, versank die Welt im Chaos. " +
+                                            "Mithilfe der Titanen vereinten sich die Nationen und k\u00e4mpften Seite an Seite miteinander, zusammen mit den Titanen, um in einem finalen Kampf schlie\u00DFlich",
+                                    "die dunkle Macht, das sogenannte \"Wirr\", in einem Berg der Schneenation zu versiegeln. " +
+                                            "Nach so langer Zeit sind \u00dcberreste der antiken Nationen und die Spuren des Krieges kaum noch zu finden. " +
+                                            "Allerdings munkelt man, ob das Wirr wirklich komplett",
+                                    "versiegelt wurde und es nicht irgendwo noch sein Unwesen treibt. \n" +
+                                            "Und so wurden die drei Nationen zu Legenden, die in Erz\u00e4hlungen der Nachfahren weiterlebten, als ein Beispiel f\u00fcr Einheit und Zusammenarbeit in Zeiten der Dunkelheit. \n",
+                                            ChatColor.BOLD + "" + ChatColor.RED + " \n\n\nAber wird diese Einheit bestehen bleiben?"
 
-                        player.getInventory().addItem(book);
+                                   );
+                            book.setItemMeta(bookMeta);
+
+                            player.getInventory().addItem(book);
+                        }, 10);
+
                     } else {
                         plugin.getLogger().info("Player " + player.getName() + " bypasses random spawns.");
                     }
+                } else {
+                    plugin.getLogger().info("Random spawns are disabled.");
                 }
             }
         }
@@ -153,7 +189,7 @@ public class PlayerListener implements Listener {
                 }
             }
             int max_height = plugin.getConfig().getInt(Config.Path.SPAWN_EXLCUSION_MAX_HEIGHT + "." + team);
-            //nicht über max height spawnen
+            //nicht \u00dcber max height spawnen
             if(max_height != 0  && y+1 > max_height) {
                 return findSafeSpawnLocation(player, team);
             }
