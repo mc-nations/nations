@@ -5,6 +5,11 @@ event_start:
 
 motd_countdown: true
 
+chat_format:
+  enabled: true
+  global: "&f[Global] %nations_prefix%&7%displayname% >&f%suffix% %message%"
+  team: "&f[Nation] &7%displayname% >&f%suffix% %message%"
+
 game_rules:
   enabled: true
   world:

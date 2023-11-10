@@ -13,6 +13,9 @@ commands:
   nations:
     permission: "nations.default"
     description: "Nation command"
+  global:
+    permission: "nations.basic"
+    description: "Global chat"
 permissions:
   nations.*:
     description: "All Nations permissions"
@@ -32,4 +35,7 @@ permissions:
   nations.bypass.event_start:
     description: "Allows you to join even if event is not started yet."
     default: "op"
+  nations.basic:
+    description: "Allows you to issue basic player commands (like global chat)"
+    default: true
 

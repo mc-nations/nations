@@ -26,6 +26,12 @@ public interface Config {
             }
         }
 
+        interface Chat {
+            static String global = "chat_format.global";
+            static String team = "chat_format.team";
+            static String enabled = "chat_format.enabled";
+        }
+
         String TEAM_BORDERS_ENABLED = "team_borders";
 
         String EVENT_START_DISABLE_JOIN = "event_start.disable_join";

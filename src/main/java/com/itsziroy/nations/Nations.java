@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager;
 import com.itsziroy.nations.commands.Commands;
 import com.itsziroy.nations.commands.TabCompletions;
 import com.itsziroy.nations.listeners.AnvilListener;
+import com.itsziroy.nations.listeners.ChatListener;
 import com.itsziroy.nations.listeners.PlayerListener;
 import com.itsziroy.nations.listeners.ServerListener;
 import com.itsziroy.nations.manager.PlayerTeamManager;
@@ -50,6 +51,7 @@ public final class Nations extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ServerListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new AnvilListener(this), this);
+        getServer().getPluginManager().registerEvents(new ChatListener(this), this);
 
 
 
